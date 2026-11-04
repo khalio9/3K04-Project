@@ -1,7 +1,7 @@
 # Build and test the ADC (Part A).   make        -> ./adc_demo  (the demo)
 #                                    make test   -> runs every test program
 CXX      ?= g++
-CXXFLAGS ?= -std=c++11 -Wall -Wextra -Iadc
+CXXFLAGS ?= -std=gnu++11 -Wall -Wextra -Iadc
 
 SRC = adc/EventLog.cpp adc/CommManager.cpp adc/Protocol.cpp adc/MsSim.cpp \
       adc/access_control.cpp adc/inventory_manager.cpp adc/dispense_controller.cpp \
