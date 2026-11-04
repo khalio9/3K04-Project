@@ -15,6 +15,9 @@
 #include <windows.h>
 #endif
 
+// Number -> text (std::to_string is missing on some older Windows compilers)
+static std::string idText(int v) { std::ostringstream o; o << v; return o.str(); }
+
 static const char *RED    = "\033[1;31m";
 static const char *YELLOW = "\033[1;33m";
 static const char *GREEN  = "\033[1;32m";
@@ -81,7 +84,7 @@ void Ui::refresh()
     for (const Fault &f : faults_.active()) {
         if (f.code == "COMM_LOSS") continue;              // already shown on the line above
         alarm(f.severity == Severity::CRITICAL ? RED : YELLOW, toString(f.severity),
-              "#" + std::to_string(f.id) + " " + f.code + (f.location.empty() ? "" : " at " + f.location) +
+              "#" + idText(f.id) + " " + f.code + (f.location.empty() ? "" : " at " + f.location) +
               (f.acknowledged ? " (acknowledged, still present)" : ""));
     }
 
@@ -181,10 +184,10 @@ bool Ui::handle(const std::string &line)
                                            dispense_.state() != TxState::Idle), "Maintenance mode. All locations locked.");
     else if (cmd == "normal")
         showResult(faults_.returnToNormal(access_.currentUser(), access_.isPermitted(Action::ClearFault).ok,
-                                          dispense_.state() != TxState::Idle), "Self-test passed. Back to NORMAL.");
+                                          dispense_.state() != TxState::Idle), "Back to NORMAL.");
     else if (cmd == "clearfault")
         showResult(faults_.clearFaults(access_.currentUser(), access_.isPermitted(Action::ClearFault).ok),
-                   "Faults cleared. Type 'normal' to run the self-test.");
+                   "Faults cleared. Type 'normal' to return to NORMAL.");
 
     // ---- Rawaad's simulated hardware (the TAs poke the cabinet with these) ----
     else if (cmd == "open")      hardware(hw_.openDrawer(a), "Drawer " + a + " opened.");
