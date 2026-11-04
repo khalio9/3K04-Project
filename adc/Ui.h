@@ -5,18 +5,25 @@
 // Secret (the private: section): screen layout, commands, and how alarms and severity
 //         are presented (colour + text + sound, NFR-USE-02).
 // No other module calls the UI (top of the uses hierarchy).
-// Owner: Omer
+// Owner: Omer (Areeb's and Rawaad's commands wired by Rawaad)
 #pragma once
 #include <functional>
 #include <string>
 #include "CommManager.h"
 #include "EventLog.h"
+#include "FaultMonitor.h"
+#include "LockDriver.h"
+#include "ModeManager.h"
 #include "MsSim.h"
+#include "SimHardware.h"
+#include "dispense_controller.h"
 
 class Ui {
 public:
     // tickAll advances every module by one second; advanceClock fast-forwards the demo clock.
     Ui(EventLog &log, CommManager &comm, MsSim &ms,
+       AccessControl &access, InventoryManager &inventory, DispenseController &dispense,
+       ModeManager &modes, FaultMonitor &faults, LockDriver &locks, SimHardware &hw,
        std::function<void()> tickAll, std::function<void(long long)> advanceClock);
 
     void run();                                   // runs until the user types "quit"
@@ -27,6 +34,13 @@ private:
     EventLog    &log_;
     CommManager &comm_;
     MsSim       &ms_;
+    AccessControl      &access_;
+    InventoryManager   &inventory_;
+    DispenseController &dispense_;
+    ModeManager        &modes_;
+    FaultMonitor       &faults_;
+    LockDriver         &locks_;
+    SimHardware        &hw_;
     std::function<void()>          tickAll_;
     std::function<void(long long)> advanceClock_;
     std::string result_ = "Ready.";
@@ -35,5 +49,6 @@ private:
     void showLog(int n);
     void help();
     void alarm(const char *colour, const std::string &severity, const std::string &what);
-    void notWired(const std::string &who);
+    void showResult(const Result &r, const std::string &okText);
+    void hardware(bool done, const std::string &okText);
 };
